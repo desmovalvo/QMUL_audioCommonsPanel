@@ -11,6 +11,18 @@ var subToActions = "PREFIX td:<http://wot.arces.unibo.it/ontology/web_of_things#
     "  ?action td:hasName ?actionName . " +
     "}"
 
+var subToSongs = "PREFIX ac:<http://audiocommons.org/ns/audiocommons#> " +
+    "PREFIX dc: <http://purl.org/dc/elements/1.1/> " +
+    "PREFIX ns: <http://ns#> " +
+    "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> " + 
+    "SELECT ?title ?uri " +
+    "WHERE { " +
+    "  ?audioClip rdf:type ac:AudioClip . " +
+    "  ?audioClip dc:title ?title . " +
+    "  ?audioClip ac:available_as ?audioFile . " +
+    "  ?audioFile ns:hasLocation ?uri " + 
+    "}";
+
 var subscriptions = {};
 var namespaces = {};
 var subscribed = false;
@@ -124,9 +136,9 @@ function subscribe(){
 	// on open
 	ws.onopen = function(){
 	    
-	    // send a subscribe request
+	    // send 2 subscribe requests
 	    ws.send(JSON.stringify({"subscribe":subToActions, "alias":"actions"}));
-	    
+	    ws.send(JSON.stringify({"subscribe":subToSongs, "alias":"songs"}));	    
 	};
 
 	// on message
@@ -184,7 +196,9 @@ function messageHandler(event){
 
 	// check the subscription
 	if (msg["alias"] === "actions"){
-	
+
+	    actTable = document.getElementById("actTable");
+	    
 	    // parse initial results
 	    for (result in msg["firstResults"]["results"]["bindings"]){
 
@@ -213,9 +227,34 @@ function messageHandler(event){
 		newCell.setAttribute("title", thingUri);
 		
 		newCell = newRow.insertCell(-1);		    
-		newCell.innerHTML = "<button action='button' class='btn btn-info btn-sm' onclick='javascript:invokeAction();'><i class='far fa-play-circle'></i>&nbsp;Invoke</button>";
+		newCell.innerHTML = '<input type="radio" id="' + actionUri + '_button" name="selectedAction" value="' + actionUri + '">';
+	    }	   
+	}
+	else if (msg["alias"] === "songs"){
+
+	    // get the table
+	    audTable = document.getElementById("audTable");
+	    
+	    // parse initial results
+	    for (result in msg["firstResults"]["results"]["bindings"]){
+		
+		console.log(result);
+		
+		// parse binding
+		title = msg["firstResults"]["results"]["bindings"][result]["title"]["value"];
+		uri = msg["firstResults"]["results"]["bindings"][result]["uri"]["value"];
+		
+		// add a row to the table
+		newRow = audTable.insertRow(-1);
+		newRow.id = title;
+		
+		// add fields to the row
+		newCell = newRow.insertCell(-1);		    
+		newCell.innerHTML = '<i class="fas fa-music"></i>&nbsp;' + title;
+		newCell = newRow.insertCell(-1);		    
+		newCell.innerHTML = '<input type="radio" id="' + uri + '" name="selectedSong" value="' + uri + '">'		
 	    }
-	}	
+	}
     }
     else { 
 
@@ -253,8 +292,8 @@ function messageHandler(event){
 		    newCell.innerHTML = '<i class="fas fa-cogs"></i>&nbsp;' + thingName;
 		    newCell.setAttribute("title", thingUri);
 
-		    newCell = newRow.insertCell(-1);		    
-		    newCell.innerHTML = "<button action='button' class='btn btn-info btn-sm' onclick='javascript:invokeAction();'><i class='far fa-play-circle'></i>&nbsp;Invoke</button>";
+		    newCell = newRow.insertCell(-1);
+		    newCell.innerHTML = '<input type="radio" id="' + actionUri + '_button" name="selectedAction" value="' + actionUri + '">';
 		}
 
 		// parse deleted results
@@ -267,8 +306,46 @@ function messageHandler(event){
 		    // check if row exists, then delete it
 		    document.getElementById(thingUri + actionUri).remove();
 		}
-	    }	   
-	}	
+	    }
+	    else if (msg["spuid"] === subscriptions["songs"]){
+		
+		// get the table
+		audTable = document.getElementById("audTable");
+		
+		// parse added results
+		for (result in msg["results"]["addedresults"]["bindings"]){
+		    
+		    console.log(result);
+		    
+		    // parse binding
+		    title = msg["results"]["addedresults"]["bindings"][result]["title"]["value"];
+		    uri = msg["results"]["addedresults"]["bindings"][result]["uri"]["value"];
+		    
+		    // add a row to the table
+		    newRow = audTable.insertRow(-1);
+		    newRow.id = title;
+		    
+		    // add fields to the row
+		    newCell = newRow.insertCell(-1);		    
+		    newCell.innerHTML = '<i class="fas fa-music"></i>&nbsp;' + title;
+		    newCell = newRow.insertCell(-1);		    
+		    newCell.innerHTML = '<input type="radio" id="' + uri + '" name="selectedSong" value="' + uri + '">'		
+		}
+
+		// parse removed results
+		for (result in msg["results"]["removedresults"]["bindings"]){
+		    
+		    console.log(result);
+		    
+		    // parse binding
+		    title = msg["results"]["removedresults"]["bindings"][result]["title"]["value"];
+		    uri = msg["results"]["removedresults"]["bindings"][result]["uri"]["value"];
+
+		    // check if row exists, then delete it
+		    document.getElementById(title).remove();
+		}			
+	    }
+	}
     }    
 }
 
