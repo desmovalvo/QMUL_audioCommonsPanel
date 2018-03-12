@@ -9,6 +9,8 @@
     <script src="bootstrap-4.0.0-beta.2/assets/js/vendor/popper.min.js">
     <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script> -->
     <script src="bootstrap-4.0.0-beta.2/dist/js/bootstrap.min.js"></script>
+    <script src="n3-browser.min.js"></script>
+    <script src="js-uuid.js"></script>
   </head>
 
   <body>
@@ -127,14 +129,8 @@
 	    <div class="card-body font-weight-light">
 	      <form>
 		<div class="form-group">
-		  <label for="transform">Transform (JAMS)</label>
-		  <input id="transform" type="text" class="form-control" value="" aria-describedby="basic-addon1">
-		  <label for="audio">Audio</label>
-		  <input id="audio" type="text" class="form-control" value="" aria-describedby="basic-addon1">
-		  <label for="writer">Writer</label>
-		  <input id="writer" type="text" class="form-control" value="" aria-describedby="basic-addon1">
-		  <br>
-		  <button action='button' class='btn btn-info btn-sm' onclick='javascript:invokeAction();'><i class='far fa-play-circle'></i>&nbsp;Invoke</button>
+		  <input type="file" class="form-control-file" id="formFile2"><br>
+		  <button type="button" class="btn btn-info btn-sm" onClick="javascript:loadTransform();">Load Transform</button>
 		</div>		
 	      </form>
 	    </div>
@@ -142,8 +138,27 @@
 	      <small><i class="fas fa-info-circle"></i>&nbsp;Input for AudioCommons actions</small>
 	    </div>
 	  </div>
-	  <!-- end of card 4 -->
-	  
+	  <!-- end of card 4 -->	  
+
+	  <!-- card 5 -->
+	  <div class="card border border-info rounded-3 m-1 mt-0">
+	    <div class="card-header text-white bg-info rounded-0"><i class="fab fa-js-square"></i>&nbsp;Action Input</div>
+	    <div class="card-body font-weight-light">
+	      <form>		
+		<div class="form-group">
+		  <label for="transform">Transform (JAMS)</label>
+		  <textarea id="transform" type="text" class="form-control" value="" aria-describedby="basic-addon1"></textarea>
+		</div>		
+		<div class="form-group">
+		  <button type='button' class='btn btn-info btn-sm' onclick="javascript:invokeAction();">Invoke</button>
+		</div>		
+	      </form>
+	    </div>
+	    <div class="card-footer">
+	      <small><i class="fas fa-info-circle"></i>&nbsp;Input for AudioCommons actions</small>
+	    </div>
+	  </div>
+	  <!-- end of card 5 -->	  
       </div>
       <!-- end of card group 3 -->
 

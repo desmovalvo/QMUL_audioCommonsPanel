@@ -226,8 +226,8 @@ function messageHandler(event){
 		newCell.innerHTML = '<i class="fas fa-cogs"></i>&nbsp;' + thingName;
 		newCell.setAttribute("title", thingUri);
 		
-		newCell = newRow.insertCell(-1);		    
-		newCell.innerHTML = '<input type="radio" id="' + actionUri + '_button" name="selectedAction" value="' + actionUri + '">';
+		newCell = newRow.insertCell(-1);
+		newCell.innerHTML = '<input type="radio" id="' + actionUri + '_' + thingUri + '" name="selectedAction" value="' + actionUri + '">';
 	    }	   
 	}
 	else if (msg["alias"] === "songs"){
@@ -293,7 +293,7 @@ function messageHandler(event){
 		    newCell.setAttribute("title", thingUri);
 
 		    newCell = newRow.insertCell(-1);
-		    newCell.innerHTML = '<input type="radio" id="' + actionUri + '_button" name="selectedAction" value="' + actionUri + '">';
+		    newCell.innerHTML = '<input type="radio" id="' + actionUri + '_' + thingUri + '" name="selectedAction" value="' + actionUri + '">';
 		}
 
 		// parse deleted results
@@ -370,4 +370,189 @@ function shorten(uri){
 /////////////////////////////////////////////////////////////////////////
 function invokeAction(){
 
+    // debug print
+    console.log("=== INFO === invokeAction called();");
+
+    // get the content of the file
+   transform = document.getElementById("transform").value;
+
+    // parse
+    var parser = N3.Parser({ format: 'N3' });
+    parsed = parser.parse(transform);
+    
+    // initialize an empty SPARQL UPDATE
+    updText = "PREFIX xsd:<http://www.w3.org/2001/XMLSchema#> INSERT DATA { ";
+
+    // get the URI of the transform
+    transformUri = null;
+    
+    // iterate over triples
+    for (triple in parsed) {
+	console.log(parsed[triple]);
+
+	// add subject
+	if (N3.Util.isIRI(parsed[triple]["subject"])){
+	    updText+= " <" + parsed[triple]["subject"] + "> "
+	    console.log("SUBJECT: " + parsed[triple]["subject"]);
+	} else {
+	    console.log("BNODE");
+	    console.log(parsed[triple]["subject"]);
+	    updText+= parsed[triple]["subject"] + " " ;
+	}
+	
+	// add predicate
+	if (N3.Util.isIRI(parsed[triple]["predicate"])){
+	    updText+= " <" + parsed[triple]["predicate"] + "> "	
+	};
+	
+	// add object
+	if (N3.Util.isIRI(parsed[triple]["object"])){
+	    updText+= " <" + parsed[triple]["object"] + "> . "	
+	} else if (N3.Util.isLiteral(parsed[triple]["object"])) {
+	    console.log(N3.Util.getLiteralType(parsed[triple]["object"])); 	   	  
+	    updText+= ' "' + N3.Util.getLiteralValue(parsed[triple]["object"]) + '" . ';
+	} else {
+	    console.log("BNODE");
+	    console.log(parsed[triple]["object"]);
+	    updText+= parsed[triple]["object"] + ' . '
+	}
+
+	// check if rdf:type transform
+	if ((parsed[triple]["predicate"] === "http://www.w3.org/1999/02/22-rdf-syntax-ns#type") &&
+	    (parsed[triple]["object"] === "http://purl.org/ontology/vamp/Transform")){
+	    transformUri = parsed[triple]["subject"];
+	}
+	
+    }
+
+    // finalize the SPARQL UPDATE
+    updText += " }"
+    
+    // get the update uri
+    updURI = document.getElementById("updateURI").value;
+
+    // send the update
+    var req = $.ajax({
+	url: updURI,
+	crossOrigin: true,
+	method: 'POST',
+	contentType: "application/sparql-update",
+	data: updText,	
+	error: function(event){
+	    console.log("[DEBUG] Connection failed!");
+	    console.log("Update request failed");
+	    return false;
+	},
+	success: function(data){
+	    console.log("Update request successful");
+	}
+    });
+    
+    // get the requested action
+    actionUri = null;
+    thingUri = null;
+    console.log(document.getElementsByName("selectedAction"));
+    actRadios = document.getElementsByName("selectedAction");
+    for (el in actRadios){
+	console.log(el);
+	if (actRadios[el].checked){
+	    console.log("SELECTED: ")
+	    console.log(actRadios[el]);
+	    actionUri = actRadios[el]["value"].split("_")[0];
+	    thingUri = actRadios[el]["value"].split("_")[1];
+	}
+    }
+
+    // get the requested song
+    songPath = null;
+    console.log(document.getElementsByName("selectedSong"));
+    songRadios = document.getElementsByName("selectedSong");
+    for (el in songRadios){
+	console.log(el);
+	if (songRadios[el].checked){
+	    console.log("SELECTED: ")
+	    console.log(songRadios[el]);
+	    songPath = songRadios[el]["value"];
+	}
+    }
+    
+    // build the sparql update with the action request
+    instanceUri = "http://ns#" + uuid.v4();
+    inputDataUri = "http://ns#" + uuid.v4();
+    inputFieldUri1 = "http://ns#" + uuid.v4();
+    inputFieldUri2 = "http://ns#" + uuid.v4();
+    updText = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> " +
+	"PREFIX wot: <http://wot.arces.unibo.it/sepa#> " +
+	"PREFIX td: <http://wot.arces.unibo.it/ontology/web_of_things#> " + 
+	"INSERT { " +
+	" <" + actionUri + "> wot:hasActionInstance <" + instanceUri + "> . " +
+	" <" + instanceUri + "> wot:hasRequestTimeStamp ?request . " +
+	" <" + instanceUri + "> wot:hasInputData <" + inputDataUri + "> . " +
+	" <" + inputDataUri + "> wot:hasInputField <" + inputFieldUri1 + "> . " +
+	" <" + inputFieldUri1 + "> wot:hasValue <" + transformUri + "> . " +
+	" <" + inputFieldUri1 + "> wot:hasName 'transformUri' . " +
+	" <" + inputDataUri + "> wot:hasInputField <" + inputFieldUri2 + "> . " +
+	" <" + inputFieldUri2 + "> wot:hasValue '" + songPath + "' . " +
+	" <" + inputFieldUri2 + "> wot:hasName 'transformUri' . " +
+    " <" + instanceUri + "> rdf:type wot:ActionInstance } " +
+	" WHERE { " +
+	" <" + actionUri + "> rdf:type td:Action . " +	
+	" BIND(now() AS ?request)}";
+
+    console.log(updText);
+    
+    // send the update
+    var req = $.ajax({
+	url: updURI,
+	crossOrigin: true,
+	method: 'POST',
+	contentType: "application/sparql-update",
+	data: updText,	
+	error: function(event){
+	    console.log("[DEBUG] Connection failed!");
+	    console.log("Update request failed");
+	    return false;
+	},
+	success: function(data){
+	    console.log("Update request successful");
+	}
+    });
+    
+}
+
+
+/////////////////////////////////////////////////////////////////////////
+//
+// load Transform
+//
+/////////////////////////////////////////////////////////////////////////
+function loadTransform(){
+
+    console.log("load transform");
+    
+    // check if file APIs are supported
+    if ( ! window.FileReader ) {
+	console.log("[ERROR] FileReader API is not supported by your browser.");
+	return false;
+    }
+
+    // read the content of the field
+    var $i = $('#formFile2');		
+    input = $i[0];
+    if ( input.files && input.files[0] ) {	
+	file = input.files[0];
+	
+	// create a mew instance of the file reader
+	fr = new FileReader();		    
+	var text;
+	fr.onload = function () {
+	    // read the content of the file
+	    var decodedData = fr.result;
+
+	    // put the content into the transform field
+	    document.getElementById("transform").value = decodedData;	    
+	    
+	}
+	fr.readAsText(file);	
+    }
 }
