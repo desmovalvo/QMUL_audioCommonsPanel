@@ -1,5 +1,7 @@
 // global vars
 
+var ws = null;
+
 var subToActions = "PREFIX td:<http://wot.arces.unibo.it/ontology/web_of_things#> " + 
     "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> " + 
     "SELECT ?thing ?thingName ?action ?actionName " + 
@@ -113,7 +115,7 @@ function subscribe(){
 	subscribeURI = document.getElementById("subscribeURI").value;
 	
 	// open a websocket
-	var ws = new WebSocket(subscribeURI);
+	ws = new WebSocket(subscribeURI);
 	
 	// define handlers
 	
@@ -255,6 +257,10 @@ function messageHandler(event){
 		newCell.innerHTML = '<input type="radio" id="' + uri + '" name="selectedSong" value="' + uri + '">'		
 	    }
 	}
+	else if (msg["alias"] === "actionOutput"){
+	    console.log("OUTPUT:")
+	    console.log(msg)
+	}
     }
     else { 
 
@@ -344,6 +350,16 @@ function messageHandler(event){
 		    // check if row exists, then delete it
 		    document.getElementById(title).remove();
 		}			
+	    }
+	    else if (msg["spuid"] === subscriptions["actionOutput"]){
+		console.log("OUTPUT:")
+		console.log(msg)
+		outMsg = ""
+		outputBox = document.getElementById("output");
+		for (result in msg["results"]["addedresults"]["bindings"]){
+		    outMsg += msg["results"]["addedresults"]["bindings"][result]["value"]["value"];
+		}
+		outputBox.innerHTML = outMsg;
 	    }
 	}
     }    
@@ -517,6 +533,30 @@ function invokeAction(){
 	    console.log("Update request successful");
 	}
     });
+
+    // now subscribe to the result
+
+    // open a new websocket
+    var ws2 = new WebSocket(subscribeURI);
+       
+    // handler onopen
+    ws2.onopen = function(){
+	subText =  "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> " +
+	    "PREFIX wot: <http://wot.arces.unibo.it/sepa#> " +
+	    "PREFIX td: <http://wot.arces.unibo.it/ontology/web_of_things#> " +
+	    "SELECT ?timestamp ?value " +
+	    " WHERE { " +
+	    " ?thing td:hasAction ?action . " +
+	    " ?action rdf:type td:Action . " +
+	    " ?action wot:hasActionInstance <" + instanceUri + "> . " +
+	    " <" + instanceUri + "> wot:hasCompletionTimeStamp ?timestamp . " + 
+	    " OPTIONAL{ " + 
+	    "   <" + instanceUri + "> wot:hasOutputData ?output . " +
+	    "   ?output wot:hasOutputField ?outputField ." +
+	    "   ?outputField wot:hasValue ?value }}"
+	ws2.send(JSON.stringify({"subscribe":subText, "alias":"actionOutput"}));	    
+    };
+    ws2.onmessage = messageHandler;
     
 }
 
