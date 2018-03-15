@@ -13,6 +13,20 @@ var subToActions = "PREFIX td:<http://wot.arces.unibo.it/ontology/web_of_things#
     "  ?action td:hasName ?actionName . " +
     "}"
 
+var subToPlugins = "PREFIX td:<http://wot.arces.unibo.it/ontology/web_of_things#> " + 
+    "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> " +
+    "PREFIX dul: <http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#> " + 
+    "SELECT ?thing ?thingName ?plugin " + 
+    "WHERE {" + 
+    "  ?thing rdf:type td:Thing . " +
+    "  ?thing td:hasName ?thingName . " +
+    "  ?thing td:hasProperty ?property . " + 
+    "  ?property rdf:type td:Property . " + 
+    "  ?property td:hasName 'hasPlugin' . " +
+    "  ?property dul:hasDataValue ?bag . " +
+    "  ?bag rdf:li ?plugin " +
+    "}"
+
 var subToSongs = "PREFIX ac:<http://audiocommons.org/ns/audiocommons#> " +
     "PREFIX dc: <http://purl.org/dc/elements/1.1/> " +
     "PREFIX ns: <http://ns#> " +
@@ -140,7 +154,8 @@ function subscribe(){
 	    
 	    // send 2 subscribe requests
 	    ws.send(JSON.stringify({"subscribe":subToActions, "alias":"actions"}));
-	    ws.send(JSON.stringify({"subscribe":subToSongs, "alias":"songs"}));	    
+	    ws.send(JSON.stringify({"subscribe":subToPlugins, "alias":"plugins"}));	    
+	    ws.send(JSON.stringify({"subscribe":subToSongs, "alias":"songs"}));	   
 	};
 
 	// on message
@@ -257,6 +272,37 @@ function messageHandler(event){
 		newCell.innerHTML = '<input type="radio" id="' + uri + '" name="selectedSong" value="' + uri + '">'		
 	    }
 	}
+	else if (msg["alias"] === "plugins"){
+
+	    plgTable = document.getElementById("plgTable");
+	    
+	    // parse initial results
+	    for (result in msg["firstResults"]["results"]["bindings"]){
+
+		console.log(result);
+		
+		// parse binding
+		plugin = msg["firstResults"]["results"]["bindings"][result]["plugin"]["value"];
+		thingUri = msg["firstResults"]["results"]["bindings"][result]["thing"]["value"];
+		thingName = msg["firstResults"]["results"]["bindings"][result]["thingName"]["value"];
+	    
+		// add a row to the table
+		newRow = plgTable.insertRow(-1);
+		    
+		// build the ID of the row with the concatenation of
+		// thingURI + actionURI
+		newRow.id = thingUri + plugin;
+		
+		// add fields to the row
+		newCell = newRow.insertCell(-1);		    
+		newCell.innerHTML = '<i class="fas fa-music"></i>&nbsp;' + plugin;
+		// newCell.setAttribute("title", actionUri);
+		
+		newCell = newRow.insertCell(-1);
+		newCell.innerHTML = '<i class="fas fa-cogs"></i>&nbsp;' + thingName;
+		newCell.setAttribute("title", thingUri);
+	    }	   
+	}
 	else if (msg["alias"] === "actionOutput"){
 	    console.log("OUTPUT:")
 	    console.log(msg)
@@ -351,6 +397,55 @@ function messageHandler(event){
 		    document.getElementById(title).remove();
 		}			
 	    }
+	    else if (msg["spuid"] === subscriptions["plugins"]){
+		
+		plgTable = document.getElementById("plgTable");
+		
+		// parse added results
+		for (result in msg["results"]["addedresults"]["bindings"]){
+		    
+		    console.log(result);
+		    
+		    // parse binding
+		    plugin = msg["results"]["addedresults"]["bindings"][result]["plugin"]["value"];
+		    thingUri = msg["results"]["addedresults"]["bindings"][result]["thing"]["value"];
+		    thingName = msg["results"]["addedresults"]["bindings"][result]["thingName"]["value"];
+		    
+		    // add a row to the table
+		    newRow = plgTable.insertRow(-1);
+		    
+		    // build the ID of the row with the concatenation of
+		    // thingURI + actionURI
+		    newRow.id = thingUri + plugin;
+		    
+		    // add fields to the row
+		    newCell = newRow.insertCell(-1);		    
+		    newCell.innerHTML = '<i class="fas fa-music"></i>&nbsp;' + plugin;
+		    // newCell.setAttribute("title", actionUri);
+		    
+		    newCell = newRow.insertCell(-1);
+		    newCell.innerHTML = '<i class="fas fa-cogs"></i>&nbsp;' + thingName;
+		    newCell.setAttribute("title", thingUri);
+		    
+		}
+	
+		// parse deleted results
+		for (result in msg["results"]["removedresults"]["bindings"]){
+		    		    
+		    // parse binding
+		    plugin = msg["results"]["removedresults"]["bindings"][result]["plugin"]["value"];
+		    thingUri = msg["results"]["removedresults"]["bindings"][result]["thing"]["value"];
+		    thingName = msg["results"]["removedresults"]["bindings"][result]["thingName"]["value"];
+		    
+		    // build the ID of the row with the concatenation of
+		    // thingURI + plugin
+		    title = thingUri + plugin;
+		    
+		    // check if row exists, then delete it
+		    document.getElementById(title).remove();
+		}	   
+		
+	    }	    
 	    else if (msg["spuid"] === subscriptions["actionOutput"]){
 		console.log("OUTPUT:")
 		console.log(msg)
@@ -509,7 +604,7 @@ function invokeAction(){
 	" <" + inputFieldUri1 + "> wot:hasName 'transformUri' . " +
 	" <" + inputDataUri + "> wot:hasInputField <" + inputFieldUri2 + "> . " +
 	" <" + inputFieldUri2 + "> wot:hasValue '" + songPath + "' . " +
-	" <" + inputFieldUri2 + "> wot:hasName 'transformUri' . " +
+	" <" + inputFieldUri2 + "> wot:hasName 'audio' . " +
     " <" + instanceUri + "> rdf:type wot:ActionInstance } " +
 	" WHERE { " +
 	" <" + actionUri + "> rdf:type td:Action . " +	

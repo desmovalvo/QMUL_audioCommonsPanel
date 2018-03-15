@@ -7,10 +7,10 @@
     <!-- link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous"> -->
     <script src="jquery-3.3.1.min.js"></script>
     <script src="bootstrap-4.0.0-beta.2/assets/js/vendor/popper.min.js">
-    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script> -->
-    <script src="bootstrap-4.0.0-beta.2/dist/js/bootstrap.min.js"></script>
-    <script src="n3-browser.min.js"></script>
-    <script src="js-uuid.js"></script>
+      <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script> -->
+      <script src="bootstrap-4.0.0-beta.2/dist/js/bootstrap.min.js"></script>
+      <script src="n3-browser.min.js"></script>
+      <script src="js-uuid.js"></script>
   </head>
 
   <body>
@@ -34,158 +34,175 @@
 	  <!-- card group 1 -->
 	  <div class="card-group">
 	    
-	  <!-- card 0 -->
-	  <div class="card border border-info rounded-3 m-1 mt-0">
-	    <div class="card-header text-white bg-info rounded-0"><i class="fab fa-js-square"></i>&nbsp;Configuration File</div>
-	    <div class="card-body font-weight-light">
-	      <form>
-		<div class="form-group">
-		  <input type="file" class="form-control-file" id="formFile1">
-		</div>
-		<button type="button" class="btn btn-info btn-sm" onClick="javascript:loadJSAP();">Load</button>
-	      </form>
+	    <!-- card 0 -->
+	    <div class="card border border-info rounded-3 m-1 mt-0">
+	      <div class="card-header text-white bg-info rounded-0"><i class="fab fa-js-square"></i>&nbsp;Configuration File</div>
+	      <div class="card-body font-weight-light">
+		<form>
+		  <div class="form-group">
+		    <input type="file" class="form-control-file" id="formFile1">
+		  </div>
+		  <button type="button" class="btn btn-info btn-sm" onClick="javascript:loadJSAP();">Load</button>
+		</form>
+	      </div>
+	      <div class="card-footer">
+		<small><i class="fas fa-info-circle"></i>&nbsp;Use this box to load your JSAP configuration</small>
+	      </div>
 	    </div>
-	    <div class="card-footer">
-	      <small><i class="fas fa-info-circle"></i>&nbsp;Use this box to load your JSAP configuration</small>
-	    </div>
-	  </div>
-	  <!-- end of card 0 -->
+	    <!-- end of card 0 -->
 	    
-	  <!-- card 1 -->
-	  <div class="card border border-info rounded-3 m-1 mt-0">
-	    <div class="card-header text-white bg-info rounded-0"><i class="fab fa-js-square"></i>&nbsp;SEPA Parameters</div>
-	    <div class="card-body font-weight-light">
-	      <form>
-		<div class="form-group">		 
-		  <label for="subscribeURI">Subscribe URI</label>
-		  <input id="subscribeURI" type="text" class="form-control" value="ws://localhost:9000/subscribe" aria-describedby="basic-addon1">
-		  <label for="updateURI">Update URL</label>
-		  <input id="updateURI" type="text" class="form-control" value="http://localhost:8000/update" aria-describedby="basic-addon1">
-		</div>
-		<button id="subscribeBtn" type="button" class="btn btn-info btn-sm" onClick="javascript:subscribe();">Subscribe</button>
-	      </form>
+	    <!-- card 1 -->
+	    <div class="card border border-info rounded-3 m-1 mt-0">
+	      <div class="card-header text-white bg-info rounded-0"><i class="fab fa-js-square"></i>&nbsp;SEPA Parameters</div>
+	      <div class="card-body font-weight-light">
+		<form>
+		  <div class="form-group">		 
+		    <label for="subscribeURI">Subscribe URI</label>
+		    <input id="subscribeURI" type="text" class="form-control" value="ws://localhost:9000/subscribe" aria-describedby="basic-addon1">
+		    <label for="updateURI">Update URL</label>
+		    <input id="updateURI" type="text" class="form-control" value="http://localhost:8000/update" aria-describedby="basic-addon1">
+		  </div>
+		  <button id="subscribeBtn" type="button" class="btn btn-info btn-sm" onClick="javascript:subscribe();">Subscribe</button>
+		</form>
+	      </div>
+	      <div class="card-footer">
+		<small><i class="fas fa-info-circle"></i>&nbsp;Parameters of the SEPA server</small>
+	      </div>
 	    </div>
-	    <div class="card-footer">
-	      <small><i class="fas fa-info-circle"></i>&nbsp;Parameters of the SEPA server</small>
-	    </div>
-	  </div>
-	  <!-- end of card 1 -->
+	    <!-- end of card 1 -->
 
-	  <!-- card 2 -->
-	  <div class="card border border-info rounded-3 m-1 mt-0">
-	    <div class="card-header text-white bg-info rounded-0"><i class="fab fa-js-square"></i>&nbsp;Namespaces</div>
-	    <div class="card-body font-weight-light">
-	      <table id="nsTable" class="table table-striped table-sm table-responsive">
-	      </table>
+	    <!-- card 2 -->
+	    <div class="card border border-info rounded-3 m-1 mt-0">
+	      <div class="card-header text-white bg-info rounded-0"><i class="fab fa-js-square"></i>&nbsp;Namespaces</div>
+	      <div class="card-body font-weight-light">
+		<table id="nsTable" class="table table-striped table-sm table-responsive">
+		</table>
+	      </div>
+	      <div class="card-footer">
+		<small><i class="fas fa-info-circle"></i>&nbsp;Namespaces</small>
+	      </div>
 	    </div>
-	    <div class="card-footer">
-	      <small><i class="fas fa-info-circle"></i>&nbsp;Namespaces</small>
-	    </div>
-	  </div>
-	  <!-- end of card 2 -->
-	  
+	    <!-- end of card 2 -->
+	    
 	  </div>
 	  <!-- end of card group 1 -->
 
 	  
-      <!-- card group 2 -->
-      <div class="card-group">	
-	  <!-- card 3 -->
-	  <div class="card border border-info rounded-3 m-1 mt-0">
-	    <div class="card-header text-white bg-info rounded-0"><i class="fab fa-js-square"></i>&nbsp;Actions</div>
-	    <div class="card-body font-weight-light">
-	      <table id="actTable" class="table table-striped table-sm table-bordered">
-		<th>Action</th><th>Provided by:</th>
-	      </table>
+	  <!-- card group 2 -->
+	  <div class="card-group">	
+	    <!-- card 3 -->
+	    <div class="card border border-info rounded-3 m-1 mt-0">
+	      <div class="card-header text-white bg-info rounded-0"><i class="fab fa-js-square"></i>&nbsp;Actions</div>
+	      <div class="card-body font-weight-light">
+		<table id="actTable" class="table table-striped table-sm table-bordered">
+		  <th>Action</th><th>Provided by:</th>
+		</table>
+	      </div>
+	      <div class="card-footer">
+		<small><i class="fas fa-info-circle"></i>&nbsp;List of AudioCommons devices and actions. Put the mouse over to see URIs.</small>
+	      </div>
 	    </div>
-	    <div class="card-footer">
-	      <small><i class="fas fa-info-circle"></i>&nbsp;List of AudioCommons devices and actions. Put the mouse over to see URIs.</small>
-	    </div>
-	  </div>
-	  <!-- end of card 3 -->
+	    <!-- end of card 3 -->
 
-	  <!-- card 3.1 -->
-	  <div class="card border border-info rounded-3 m-1 mt-0">
-	    <div class="card-header text-white bg-info rounded-0"><i class="fab fa-js-square"></i>&nbsp;Audio Files</div>
-	    <div class="card-body font-weight-light">
-	      <table id="audTable" class="table table-striped table-sm table-bordered">
-		<th>Audio File</th>
-	      </table>
+	    <!-- card 4 -->
+	    <div class="card border border-info rounded-3 m-1 mt-0">
+	      <div class="card-header text-white bg-info rounded-0"><i class="fab fa-js-square"></i>&nbsp;Available Plugins</div>
+	      <div class="card-body font-weight-light">
+		<table id="plgTable" class="table table-striped table-sm table-bordered">
+		  <th>Plugin</th>
+		</table>
+	      </div>
+	      <div class="card-footer">
+		<small><i class="fas fa-info-circle"></i>&nbsp;List of Audio plugins available for elaboration.</small>
+	      </div>
 	    </div>
-	    <div class="card-footer">
-	      <small><i class="fas fa-info-circle"></i>&nbsp;List of Audio Files available for elaboration.</small>
-	    </div>
+	    <!-- end of card 4 -->
+	    	    
 	  </div>
-	  <!-- end of card 3.1 -->
+	  <!-- end of card group 2 -->
+
+	  <!-- card group 3 -->
+	  <div class="card-group">
+
+	    <!-- card 5 -->
+	    <div class="card border border-info rounded-3 m-1 mt-0">
+	      <div class="card-header text-white bg-info rounded-0"><i class="fab fa-js-square"></i>&nbsp;Audio Files</div>
+	      <div class="card-body font-weight-light">
+		<table id="audTable" class="table table-striped table-sm table-bordered">
+		  <th>Audio File</th>
+		</table>
+	      </div>
+	      <div class="card-footer">
+		<small><i class="fas fa-info-circle"></i>&nbsp;List of Audio Files available for elaboration.</small>
+	      </div>
+	    </div>
+	    <!-- end of card 5 -->
+	   
+	  </div>
+	  <!-- end of card group 3 -->
+
+	  <!-- card group 4 -->
+	  <div class="card-group">	
+
+	    <!-- card 6 -->
+	    <div class="card border border-info rounded-3 m-1 mt-0">
+	      <div class="card-header text-white bg-info rounded-0"><i class="fab fa-js-square"></i>&nbsp;Action Input</div>
+	      <div class="card-body font-weight-light">
+		<form>
+		  <div class="form-group">
+		    <input type="file" class="form-control-file" id="formFile2"><br>
+		    <button type="button" class="btn btn-info btn-sm" onClick="javascript:loadTransform();">Load Transform</button>
+		  </div>		
+		</form>
+	      </div>
+	      <div class="card-footer">
+		<small><i class="fas fa-info-circle"></i>&nbsp;Input for AudioCommons actions</small>
+	      </div>
+	    </div>
+	    <!-- end of card 6 -->	  
+
+	    <!-- card 7 -->
+	    <div class="card border border-info rounded-3 m-1 mt-0">
+	      <div class="card-header text-white bg-info rounded-0"><i class="fab fa-js-square"></i>&nbsp;Action Input</div>
+	      <div class="card-body font-weight-light">
+		<form>		
+		  <div class="form-group">
+		    <label for="transform">Transform (JAMS)</label>
+		    <textarea id="transform" type="text" class="form-control" value="" aria-describedby="basic-addon1"></textarea>
+		  </div>		
+		  <div class="form-group">
+		    <button type='button' class='btn btn-info btn-sm' onclick="javascript:invokeAction();">Invoke</button>
+		  </div>		
+		</form>
+	      </div>
+	      <div class="card-footer">
+		<small><i class="fas fa-info-circle"></i>&nbsp;Input for AudioCommons actions</small>
+	      </div>
+	    </div>
+	    <!-- end of card 7 -->
+	    
+	    <!-- card 8 -->
+	    <div class="card border border-info rounded-3 m-1 mt-0">
+	      <div class="card-header text-white bg-info rounded-0"><i class="fab fa-js-square"></i>&nbsp;Action Output</div>
+	      <div class="card-body font-weight-light">
+		<form>
+		  <div class="form-group">
+		    <label for="output">output</label>
+		    <textarea id="output" type="text" class="form-control" value="" aria-describedby="basic-addon1"></textarea>
+		  </div>		
+		</form>
+	      </div>
+	      <div class="card-footer">
+		<small><i class="fas fa-info-circle"></i>&nbsp;Ouput of AudioCommons actions</small>
+	      </div>
+	    </div>
+	    <!-- end of card 8 -->
+	    
+	  </div>
+	  <!-- end of card group 4 -->
 	  
-      </div>
-      <!-- end of card group 2 -->
-
-      <!-- card group 3 -->
-      <div class="card-group">	
-	  <!-- card 4 -->
-	  <div class="card border border-info rounded-3 m-1 mt-0">
-	    <div class="card-header text-white bg-info rounded-0"><i class="fab fa-js-square"></i>&nbsp;Action Input</div>
-	    <div class="card-body font-weight-light">
-	      <form>
-		<div class="form-group">
-		  <input type="file" class="form-control-file" id="formFile2"><br>
-		  <button type="button" class="btn btn-info btn-sm" onClick="javascript:loadTransform();">Load Transform</button>
-		</div>		
-	      </form>
-	    </div>
-	    <div class="card-footer">
-	      <small><i class="fas fa-info-circle"></i>&nbsp;Input for AudioCommons actions</small>
-	    </div>
-	  </div>
-	  <!-- end of card 4 -->	  
-
-	  <!-- card 5 -->
-	  <div class="card border border-info rounded-3 m-1 mt-0">
-	    <div class="card-header text-white bg-info rounded-0"><i class="fab fa-js-square"></i>&nbsp;Action Input</div>
-	    <div class="card-body font-weight-light">
-	      <form>		
-		<div class="form-group">
-		  <label for="transform">Transform (JAMS)</label>
-		  <textarea id="transform" type="text" class="form-control" value="" aria-describedby="basic-addon1"></textarea>
-		</div>		
-		<div class="form-group">
-		  <button type='button' class='btn btn-info btn-sm' onclick="javascript:invokeAction();">Invoke</button>
-		</div>		
-	      </form>
-	    </div>
-	    <div class="card-footer">
-	      <small><i class="fas fa-info-circle"></i>&nbsp;Input for AudioCommons actions</small>
-	    </div>
-	  </div>
-	  <!-- end of card 5 -->	  
-      </div>
-      <!-- end of card group 3 -->
-
-      <!-- card group 4 -->
-      <div class="card-group">	
-	  <!-- card 5 -->
-	  <div class="card border border-info rounded-3 m-1 mt-0">
-	    <div class="card-header text-white bg-info rounded-0"><i class="fab fa-js-square"></i>&nbsp;Action Output</div>
-	    <div class="card-body font-weight-light">
-	      <form>
-		<div class="form-group">
-		  <label for="output">output</label>
-		  <textarea id="output" type="text" class="form-control" value="" aria-describedby="basic-addon1"></textarea>
-		</div>		
-	      </form>
-	    </div>
-	    <div class="card-footer">
-	      <small><i class="fas fa-info-circle"></i>&nbsp;Ouput of AudioCommons actions</small>
-	    </div>
-	  </div>
-	  <!-- end of card 5 -->
-	  
-      </div>
-      <!-- end of card group 4 -->
-      
-    </div> <!-- end of the main container -->
+	</div> <!-- end of the main container -->
 
   </body>
 </html>
-	
+
