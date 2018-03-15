@@ -29,14 +29,12 @@ var subToPlugins = "PREFIX td:<http://wot.arces.unibo.it/ontology/web_of_things#
 
 var subToSongs = "PREFIX ac:<http://audiocommons.org/ns/audiocommons#> " +
     "PREFIX dc: <http://purl.org/dc/elements/1.1/> " +
-    "PREFIX ns: <http://ns#> " +
     "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> " + 
     "SELECT ?title ?uri " +
     "WHERE { " +
     "  ?audioClip rdf:type ac:AudioClip . " +
     "  ?audioClip dc:title ?title . " +
-    "  ?audioClip ac:available_as ?audioFile . " +
-    "  ?audioFile ns:hasLocation ?uri " + 
+    "  ?audioClip ac:available_as ?uri . " +
     "}";
 
 var subscriptions = {};
