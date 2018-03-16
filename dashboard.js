@@ -77,7 +77,9 @@ function loadJSAP(){
 	    
 	    // retrieve the URLs
 	    sURI = "ws://" + myJson["parameters"]["host"] + ":" + myJson["parameters"]["ports"]["ws"] + myJson["parameters"]["paths"]["subscribe"];
-	    document.getElementById("subscribeURI").value = sURI;    
+	    document.getElementById("subscribeURI").value = sURI;
+	    qURI = "http://" + myJson["parameters"]["host"] + ":" + myJson["parameters"]["ports"]["http"] + myJson["parameters"]["paths"]["query"];
+	    document.getElementById("queryURI").value = qURI;    
 	    uURI = "http://" + myJson["parameters"]["host"] + ":" + myJson["parameters"]["ports"]["http"] + myJson["parameters"]["paths"]["update"];
 	    document.getElementById("updateURI").value = uURI;
 
@@ -122,7 +124,7 @@ function subscribe(){
 
 	// change button label
 	document.getElementById("subscribeBtn").innerHTML = "Unsubscribe";
-		
+	
 	// get the URI
 	subscribeURI = document.getElementById("subscribeURI").value;
 	
@@ -190,7 +192,7 @@ function subscribe(){
     }
     
 };
-    
+
 
 /////////////////////////////////////////////////////////////////////////
 //
@@ -202,7 +204,6 @@ function messageHandler(event){
 
     // parse the message
     msg = JSON.parse(event.data);
-    console.log(msg);
     
     if (msg["subscribed"] !== undefined){
 
@@ -217,17 +218,15 @@ function messageHandler(event){
 	    // parse initial results
 	    for (result in msg["firstResults"]["results"]["bindings"]){
 
-		console.log(result);
-		
 		// parse binding
 		actionUri = msg["firstResults"]["results"]["bindings"][result]["action"]["value"];
 		actionName = msg["firstResults"]["results"]["bindings"][result]["actionName"]["value"];
 		thingUri = msg["firstResults"]["results"]["bindings"][result]["thing"]["value"];
 		thingName = msg["firstResults"]["results"]["bindings"][result]["thingName"]["value"];
-	    
+		
 		// add a row to the table
 		newRow = actTable.insertRow(-1);
-		    
+		
 		// build the ID of the row with the concatenation of
 		// thingURI + actionURI
 		newRow.id = thingUri + actionUri;
@@ -253,8 +252,6 @@ function messageHandler(event){
 	    // parse initial results
 	    for (result in msg["firstResults"]["results"]["bindings"]){
 		
-		console.log(result);
-		
 		// parse binding
 		title = msg["firstResults"]["results"]["bindings"][result]["title"]["value"];
 		uri = msg["firstResults"]["results"]["bindings"][result]["uri"]["value"];
@@ -276,17 +273,15 @@ function messageHandler(event){
 	    
 	    // parse initial results
 	    for (result in msg["firstResults"]["results"]["bindings"]){
-
-		console.log(result);
 		
 		// parse binding
 		plugin = msg["firstResults"]["results"]["bindings"][result]["plugin"]["value"];
 		thingUri = msg["firstResults"]["results"]["bindings"][result]["thing"]["value"];
 		thingName = msg["firstResults"]["results"]["bindings"][result]["thingName"]["value"];
-	    
+		
 		// add a row to the table
 		newRow = plgTable.insertRow(-1);
-		    
+		
 		// build the ID of the row with the concatenation of
 		// thingURI + actionURI
 		newRow.id = thingUri + plugin;
@@ -302,8 +297,7 @@ function messageHandler(event){
 	    }	   
 	}
 	else if (msg["alias"] === "actionOutput"){
-	    console.log("OUTPUT:")
-	    console.log(msg)
+	    // pass
 	}
     }
     else { 
@@ -365,8 +359,6 @@ function messageHandler(event){
 		// parse added results
 		for (result in msg["results"]["addedresults"]["bindings"]){
 		    
-		    console.log(result);
-		    
 		    // parse binding
 		    title = msg["results"]["addedresults"]["bindings"][result]["title"]["value"];
 		    uri = msg["results"]["addedresults"]["bindings"][result]["uri"]["value"];
@@ -385,8 +377,6 @@ function messageHandler(event){
 		// parse removed results
 		for (result in msg["results"]["removedresults"]["bindings"]){
 		    
-		    console.log(result);
-		    
 		    // parse binding
 		    title = msg["results"]["removedresults"]["bindings"][result]["title"]["value"];
 		    uri = msg["results"]["removedresults"]["bindings"][result]["uri"]["value"];
@@ -401,8 +391,6 @@ function messageHandler(event){
 		
 		// parse added results
 		for (result in msg["results"]["addedresults"]["bindings"]){
-		    
-		    console.log(result);
 		    
 		    // parse binding
 		    plugin = msg["results"]["addedresults"]["bindings"][result]["plugin"]["value"];
@@ -426,10 +414,10 @@ function messageHandler(event){
 		    newCell.setAttribute("title", thingUri);
 		    
 		}
-	
+		
 		// parse deleted results
 		for (result in msg["results"]["removedresults"]["bindings"]){
-		    		    
+		    
 		    // parse binding
 		    plugin = msg["results"]["removedresults"]["bindings"][result]["plugin"]["value"];
 		    thingUri = msg["results"]["removedresults"]["bindings"][result]["thing"]["value"];
@@ -445,17 +433,115 @@ function messageHandler(event){
 		
 	    }	    
 	    else if (msg["spuid"] === subscriptions["actionOutput"]){
-		console.log("OUTPUT:")
-		console.log(msg)
-		outMsg = ""
+
+		// ok, now the output is ready.
+		// 1 - we get the uri of the named graph containing the results	    	    
+		graphUri = ""
 		outputBox = document.getElementById("output");
 		for (result in msg["results"]["addedresults"]["bindings"]){
-		    outMsg += msg["results"]["addedresults"]["bindings"][result]["value"]["value"];
+		    graphUri = msg["results"]["addedresults"]["bindings"][result]["value"]["value"];
+
+		    // 2 - we retrieve all the triples in that named graph
+		    queryURI = document.getElementById("queryURI").value;
+		    qText = "SELECT ?s ?p ?o WHERE { " +
+			" GRAPH <" + graphUri + "> { " +
+			" ?s ?p ?o }}";
+		    var req = $.ajax({
+			url: queryURI,
+			crossOrigin: true,
+			method: 'POST',
+			contentType: "application/sparql-query",
+			data: qText,	
+			error: function(event){
+			    console.log("[DEBUG] Connection failed!");
+			    console.log("Query request failed");
+			    return false;
+			},
+			success: function(data){
+			    console.log(data);
+			    console.log("Query request successful");
+
+			    var writer = N3.Writer();
+			    for (result in data["results"]["bindings"]){
+
+				// subject
+				s = null
+				if (data["results"]["bindings"][result]["s"]["type"] === "uri"){
+				    s = data["results"]["bindings"][result]["s"]["value"]
+				} else {
+				    s = data["results"]["bindings"][result]["s"]["value"];
+				}
+				
+				// predicate
+				p = null
+				if (data["results"]["bindings"][result]["p"]["type"] === "uri"){
+				    p = data["results"]["bindings"][result]["p"]["value"]
+				} else {
+				    p = data["results"]["bindings"][result]["p"]["value"];
+				}
+				
+				// object
+				o = null
+				if (data["results"]["bindings"][result]["o"]["type"] === "uri"){
+				    o = data["results"]["bindings"][result]["o"]["value"]
+				} else if (data["results"]["bindings"][result]["o"]["type"] === "bnode"){
+				    o = data["results"]["bindings"][result]["o"]["value"];
+				} else {
+				    o = '"' + data["results"]["bindings"][result]["o"]["value"] + '"';
+				}
+
+				// add the triple to the writer		  
+				writer.addTriple(s,p,o);
+			    }
+			    writer.end(function (error, result) {
+			    	outputBox.innerHTML = result;
+			    });
+			}
+		    });		    
+		    
+		    // 3 - we delete the action instance and its output
+		    updText = "PREFIX td:<http://wot.arces.unibo.it/ontology/web_of_things#> " + 
+			"PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> " +
+			"PREFIX dul: <http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#> " +
+			"PREFIX wot: <http://wot.arces.unibo.it/sepa#> " + 
+			"DELETE { " +
+			"  ?action wot:hasActionInstance ?instance . " + 
+			"  ?instance wot:hasRequestTimeStamp ?request . " +
+			"  ?instance wot:hasConfirmationTimeStamp ?confirmation. " + 
+			"  ?instance wot:hasCompletionTimeStamp ?completion . " + 
+			"  ?instance rdf:type wot:ActionInstance . " + 
+			"  ?instance wot:hasInputData ?inputData . " + 
+			"  ?inputData dul:hasDataValue ?value . " +
+			"  ?s ?p ?o } " + 
+			"WHERE { " + 
+			"  ?action rdf:type td:Action . " + 
+			"  ?action wot:hasActionInstance ?instance . " + 
+			"  ?instance wot:hasInputData ?inputData . " +
+			"  OPTIONAL { ?inputData dul:hasDataValue ?value } . " +
+			"  ?instance wot:hasRequestTimeStamp ?request . " +
+			"  OPTIONAL { ?instance wot:hasConfirmationTimeStamp ?confirmation } . " + 
+			"  OPTIONAL { ?instance wot:hasCompletionTimeStamp ?completion } . " +
+			"  GRAPH <" + graphUri + "> { ?s ?p ?o } " +
+		    "}";		
+		    var req = $.ajax({
+			url: updURI,
+			crossOrigin: true,
+			method: 'POST',
+			contentType: "application/sparql-update",
+			data: updText,	
+			error: function(event){
+			    console.log("[DEBUG] Connection failed!");
+			    console.log("Update request failed");
+			    return false;
+			},
+			success: function(data){
+			    console.log("Update request successful");
+			}
+		    });		
 		}
-		outputBox.innerHTML = outMsg;
 	    }
-	}
-    }    
+	}    
+    }
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -483,7 +569,7 @@ function invokeAction(){
     console.log("=== INFO === invokeAction called();");
 
     // get the content of the file
-   transform = document.getElementById("transform").value;
+    transform = document.getElementById("transform").value;
 
     // parse
     var parser = N3.Parser({ format: 'N3' });
@@ -497,15 +583,11 @@ function invokeAction(){
     
     // iterate over triples
     for (triple in parsed) {
-	console.log(parsed[triple]);
 
 	// add subject
 	if (N3.Util.isIRI(parsed[triple]["subject"])){
 	    updText+= " <" + parsed[triple]["subject"] + "> "
-	    console.log("SUBJECT: " + parsed[triple]["subject"]);
 	} else {
-	    console.log("BNODE");
-	    console.log(parsed[triple]["subject"]);
 	    updText+= parsed[triple]["subject"] + " " ;
 	}
 	
@@ -518,11 +600,8 @@ function invokeAction(){
 	if (N3.Util.isIRI(parsed[triple]["object"])){
 	    updText+= " <" + parsed[triple]["object"] + "> . "	
 	} else if (N3.Util.isLiteral(parsed[triple]["object"])) {
-	    console.log(N3.Util.getLiteralType(parsed[triple]["object"])); 	   	  
 	    updText+= ' "' + N3.Util.getLiteralValue(parsed[triple]["object"]) + '" . ';
 	} else {
-	    console.log("BNODE");
-	    console.log(parsed[triple]["object"]);
 	    updText+= parsed[triple]["object"] + ' . '
 	}
 
@@ -560,13 +639,9 @@ function invokeAction(){
     // get the requested action
     actionUri = null;
     thingUri = null;
-    console.log(document.getElementsByName("selectedAction"));
     actRadios = document.getElementsByName("selectedAction");
     for (el in actRadios){
-	console.log(el);
 	if (actRadios[el].checked){
-	    console.log("SELECTED: ")
-	    console.log(actRadios[el]);
 	    actionUri = actRadios[el]["value"].split("_")[0];
 	    thingUri = actRadios[el]["value"].split("_")[1];
 	}
@@ -574,64 +649,21 @@ function invokeAction(){
 
     // get the requested song
     songPath = null;
-    console.log(document.getElementsByName("selectedSong"));
     songRadios = document.getElementsByName("selectedSong");
     for (el in songRadios){
-	console.log(el);
 	if (songRadios[el].checked){
-	    console.log("SELECTED: ")
-	    console.log(songRadios[el]);
 	    songPath = songRadios[el]["value"];
 	}
     }
     
     // build the sparql update with the action request
     instanceUri = "http://ns#" + uuid.v4();
-    inputDataUri = "http://ns#" + uuid.v4();
-    inputFieldUri1 = "http://ns#" + uuid.v4();
-    inputFieldUri2 = "http://ns#" + uuid.v4();
-    updText = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> " +
-	"PREFIX wot: <http://wot.arces.unibo.it/sepa#> " +
-	"PREFIX td: <http://wot.arces.unibo.it/ontology/web_of_things#> " + 
-	"INSERT { " +
-	" <" + actionUri + "> wot:hasActionInstance <" + instanceUri + "> . " +
-	" <" + instanceUri + "> wot:hasRequestTimeStamp ?request . " +
-	" <" + instanceUri + "> wot:hasInputData <" + inputDataUri + "> . " +
-	" <" + inputDataUri + "> wot:hasInputField <" + inputFieldUri1 + "> . " +
-	" <" + inputFieldUri1 + "> wot:hasValue <" + transformUri + "> . " +
-	" <" + inputFieldUri1 + "> wot:hasName 'transformUri' . " +
-	" <" + inputDataUri + "> wot:hasInputField <" + inputFieldUri2 + "> . " +
-	" <" + inputFieldUri2 + "> wot:hasValue '" + songPath + "' . " +
-	" <" + inputFieldUri2 + "> wot:hasName 'audio' . " +
-    " <" + instanceUri + "> rdf:type wot:ActionInstance } " +
-	" WHERE { " +
-	" <" + actionUri + "> rdf:type td:Action . " +	
-	" BIND(now() AS ?request)}";
 
-    console.log(updText);
-    
-    // send the update
-    var req = $.ajax({
-	url: updURI,
-	crossOrigin: true,
-	method: 'POST',
-	contentType: "application/sparql-update",
-	data: updText,	
-	error: function(event){
-	    console.log("[DEBUG] Connection failed!");
-	    console.log("Update request failed");
-	    return false;
-	},
-	success: function(data){
-	    console.log("Update request successful");
-	}
-    });
-
-    // now subscribe to the result
+    // subscribe to the result
 
     // open a new websocket
     var ws2 = new WebSocket(subscribeURI);
-       
+    
     // handler onopen
     ws2.onopen = function(){
 	subText =  "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> " +
@@ -650,6 +682,45 @@ function invokeAction(){
 	ws2.send(JSON.stringify({"subscribe":subText, "alias":"actionOutput"}));	    
     };
     ws2.onmessage = messageHandler;
+
+    // insert the update request into sepa
+    inputDataUri = "http://ns#" + uuid.v4();
+    inputFieldUri1 = "http://ns#" + uuid.v4();
+    inputFieldUri2 = "http://ns#" + uuid.v4();
+    updText = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> " +
+	"PREFIX wot: <http://wot.arces.unibo.it/sepa#> " +
+	"PREFIX td: <http://wot.arces.unibo.it/ontology/web_of_things#> " + 
+	"INSERT { " +
+	" <" + actionUri + "> wot:hasActionInstance <" + instanceUri + "> . " +
+	" <" + instanceUri + "> wot:hasRequestTimeStamp ?request . " +
+	" <" + instanceUri + "> wot:hasInputData <" + inputDataUri + "> . " +
+	" <" + inputDataUri + "> wot:hasInputField <" + inputFieldUri1 + "> . " +
+	" <" + inputFieldUri1 + "> wot:hasValue <" + transformUri + "> . " +
+	" <" + inputFieldUri1 + "> wot:hasName 'transformUri' . " +
+	" <" + inputDataUri + "> wot:hasInputField <" + inputFieldUri2 + "> . " +
+	" <" + inputFieldUri2 + "> wot:hasValue '" + songPath + "' . " +
+	" <" + inputFieldUri2 + "> wot:hasName 'audio' . " +
+	" <" + instanceUri + "> rdf:type wot:ActionInstance } " +
+	" WHERE { " +
+	" <" + actionUri + "> rdf:type td:Action . " +	
+	" BIND(now() AS ?request)}";
+    
+    // send the update
+    var req = $.ajax({
+	url: updURI,
+	crossOrigin: true,
+	method: 'POST',
+	contentType: "application/sparql-update",
+	data: updText,	
+	error: function(event){
+	    console.log("[DEBUG] Connection failed!");
+	    console.log("Update request failed");
+	    return false;
+	},
+	success: function(data){
+	    console.log("Update request successful");
+	}
+    });
     
 }
 
@@ -661,8 +732,6 @@ function invokeAction(){
 /////////////////////////////////////////////////////////////////////////
 function loadTransform(){
 
-    console.log("load transform");
-    
     // check if file APIs are supported
     if ( ! window.FileReader ) {
 	console.log("[ERROR] FileReader API is not supported by your browser.");
