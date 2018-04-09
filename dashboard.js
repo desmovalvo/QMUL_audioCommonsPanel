@@ -223,26 +223,30 @@ function messageHandler(event){
 		actionName = msg["firstResults"]["results"]["bindings"][result]["actionName"]["value"];
 		thingUri = msg["firstResults"]["results"]["bindings"][result]["thing"]["value"];
 		thingName = msg["firstResults"]["results"]["bindings"][result]["thingName"]["value"];
+
+		newid = thingUri + actionUri;
+		if (document.getElementById(newid) === null){
 		
-		// add a row to the table
-		newRow = actTable.insertRow(-1);
+		    // add a row to the table
+		    newRow = actTable.insertRow(-1);
 		
-		// build the ID of the row with the concatenation of
-		// thingURI + actionURI
-		newRow.id = thingUri + actionUri;
+		    // build the ID of the row with the concatenation of
+		    // thingURI + actionURI
+		    newRow.id = newid;
+			
+		    // add fields to the row
+		    newCell = newRow.insertCell(-1);		    
+		    newCell.innerHTML = '<i class="fas fa-music"></i>&nbsp;' + actionName;
+		    newCell.setAttribute("title", actionUri);
 		
-		// add fields to the row
-		newCell = newRow.insertCell(-1);		    
-		newCell.innerHTML = '<i class="fas fa-music"></i>&nbsp;' + actionName;
-		newCell.setAttribute("title", actionUri);
-		
-		newCell = newRow.insertCell(-1);
-		newCell.innerHTML = '<i class="fas fa-cogs"></i>&nbsp;' + thingName;
-		newCell.setAttribute("title", thingUri);
-		
-		newCell = newRow.insertCell(-1);
-		newCell.innerHTML = '<input type="radio" id="' + actionUri + '_' + thingUri + '" name="selectedAction" value="' + actionUri + '">';
-	    }	   
+		    newCell = newRow.insertCell(-1);
+		    newCell.innerHTML = '<i class="fas fa-cogs"></i>&nbsp;' + thingName;
+		    newCell.setAttribute("title", thingUri);
+		    
+		    newCell = newRow.insertCell(-1);
+		    newCell.innerHTML = '<input type="radio" id="' + actionUri + '_' + thingUri + '" name="selectedAction" value="' + actionUri + '">';
+		}
+	    }
 	}
 	else if (msg["alias"] === "songs"){
 
@@ -255,16 +259,19 @@ function messageHandler(event){
 		// parse binding
 		title = msg["firstResults"]["results"]["bindings"][result]["title"]["value"];
 		uri = msg["firstResults"]["results"]["bindings"][result]["uri"]["value"];
-		
-		// add a row to the table
-		newRow = audTable.insertRow(-1);
-		newRow.id = title;
-		
-		// add fields to the row
-		newCell = newRow.insertCell(-1);		    
-		newCell.innerHTML = '<i class="fas fa-music"></i>&nbsp;' + title;
-		newCell = newRow.insertCell(-1);		    
-		newCell.innerHTML = '<input type="radio" id="' + uri + '" name="selectedSong" value="' + uri + '">'		
+
+		if (document.getElementById(title) === null){
+		    
+		    // add a row to the table
+		    newRow = audTable.insertRow(-1);
+		    newRow.id = title;
+		    
+		    // add fields to the row
+		    newCell = newRow.insertCell(-1);		    
+		    newCell.innerHTML = '<i class="fas fa-music"></i>&nbsp;' + title;
+		    newCell = newRow.insertCell(-1);		    
+		    newCell.innerHTML = '<input type="radio" id="' + uri + '" name="selectedSong" value="' + uri + '">'
+		}
 	    }
 	}
 	else if (msg["alias"] === "plugins"){
@@ -278,22 +285,26 @@ function messageHandler(event){
 		plugin = msg["firstResults"]["results"]["bindings"][result]["plugin"]["value"];
 		thingUri = msg["firstResults"]["results"]["bindings"][result]["thing"]["value"];
 		thingName = msg["firstResults"]["results"]["bindings"][result]["thingName"]["value"];
+		newid = thingUri + plugin;
+
+		if (document.getElementById(newid) === null){
 		
-		// add a row to the table
-		newRow = plgTable.insertRow(-1);
-		
-		// build the ID of the row with the concatenation of
-		// thingURI + actionURI
-		newRow.id = thingUri + plugin;
-		
-		// add fields to the row
-		newCell = newRow.insertCell(-1);		    
-		newCell.innerHTML = '<i class="fas fa-music"></i>&nbsp;' + plugin;
-		// newCell.setAttribute("title", actionUri);
-		
-		newCell = newRow.insertCell(-1);
-		newCell.innerHTML = '<i class="fas fa-cogs"></i>&nbsp;' + thingName;
-		newCell.setAttribute("title", thingUri);
+		    // add a row to the table
+		    newRow = plgTable.insertRow(-1);
+		    
+		    // build the ID of the row with the concatenation of
+		    // thingURI + actionURI
+		    newRow.id = newid;
+		    
+		    // add fields to the row
+		    newCell = newRow.insertCell(-1);		    
+		    newCell.innerHTML = '<i class="fas fa-music"></i>&nbsp;' + plugin;
+		    // newCell.setAttribute("title", actionUri);
+		    
+		    newCell = newRow.insertCell(-1);
+		    newCell.innerHTML = '<i class="fas fa-cogs"></i>&nbsp;' + thingName;
+		    newCell.setAttribute("title", thingUri);
+		}
 	    }	   
 	}
 	else if (msg["alias"] === "actionOutput"){
@@ -319,25 +330,29 @@ function messageHandler(event){
 		    actionName = msg["results"]["addedresults"]["bindings"][result]["actionName"]["value"];
 		    thingUri = msg["results"]["addedresults"]["bindings"][result]["thing"]["value"];
 		    thingName = msg["results"]["addedresults"]["bindings"][result]["thingName"]["value"];
+		    newid = thingUri + actionUri;
 
-		    // add a row to the table
-		    newRow = actTable.insertRow(-1);
+		    if (document.getElementById(newid) === null){
 		    
-		    // build the ID of the row with the concatenation of
-		    // thingURI + actionURI
-		    newRow.id = thingUri + actionUri;
-		    
-		    // add fields to the row
-		    newCell = newRow.insertCell(-1);		    
-		    newCell.innerHTML = '<i class="fas fa-music"></i>&nbsp;' + actionName;
-		    newCell.setAttribute("title", actionUri);
-		    
-		    newCell = newRow.insertCell(-1);
-		    newCell.innerHTML = '<i class="fas fa-cogs"></i>&nbsp;' + thingName;
-		    newCell.setAttribute("title", thingUri);
-
-		    newCell = newRow.insertCell(-1);
-		    newCell.innerHTML = '<input type="radio" id="' + actionUri + '_' + thingUri + '" name="selectedAction" value="' + actionUri + '">';
+			// add a row to the table
+			newRow = actTable.insertRow(-1);
+			
+			// build the ID of the row with the concatenation of
+			// thingURI + actionURI
+			newRow.id = newid;
+			
+			// add fields to the row
+			newCell = newRow.insertCell(-1);		    
+			newCell.innerHTML = '<i class="fas fa-music"></i>&nbsp;' + actionName;
+			newCell.setAttribute("title", actionUri);
+			
+			newCell = newRow.insertCell(-1);
+			newCell.innerHTML = '<i class="fas fa-cogs"></i>&nbsp;' + thingName;
+			newCell.setAttribute("title", thingUri);
+			
+			newCell = newRow.insertCell(-1);
+			newCell.innerHTML = '<input type="radio" id="' + actionUri + '_' + thingUri + '" name="selectedAction" value="' + actionUri + '">';
+		    }
 		}
 
 		// parse deleted results
@@ -362,16 +377,19 @@ function messageHandler(event){
 		    // parse binding
 		    title = msg["results"]["addedresults"]["bindings"][result]["title"]["value"];
 		    uri = msg["results"]["addedresults"]["bindings"][result]["uri"]["value"];
+
+		    if (document.getElementById(title) === null){
 		    
-		    // add a row to the table
-		    newRow = audTable.insertRow(-1);
-		    newRow.id = title;
-		    
-		    // add fields to the row
-		    newCell = newRow.insertCell(-1);		    
-		    newCell.innerHTML = '<i class="fas fa-music"></i>&nbsp;' + title;
-		    newCell = newRow.insertCell(-1);		    
-		    newCell.innerHTML = '<input type="radio" id="' + uri + '" name="selectedSong" value="' + uri + '">'		
+			// add a row to the table
+			newRow = audTable.insertRow(-1);
+			newRow.id = title;
+			
+			// add fields to the row
+			newCell = newRow.insertCell(-1);		    
+			newCell.innerHTML = '<i class="fas fa-music"></i>&nbsp;' + title;
+			newCell = newRow.insertCell(-1);		    
+			newCell.innerHTML = '<input type="radio" id="' + uri + '" name="selectedSong" value="' + uri + '">'
+		    }
 		}
 
 		// parse removed results
@@ -396,22 +414,26 @@ function messageHandler(event){
 		    plugin = msg["results"]["addedresults"]["bindings"][result]["plugin"]["value"];
 		    thingUri = msg["results"]["addedresults"]["bindings"][result]["thing"]["value"];
 		    thingName = msg["results"]["addedresults"]["bindings"][result]["thingName"]["value"];
+		    newid = thingUri + plugin;
+
+		    if (document.getElementById(newid) === null){
 		    
-		    // add a row to the table
-		    newRow = plgTable.insertRow(-1);
-		    
-		    // build the ID of the row with the concatenation of
-		    // thingURI + actionURI
-		    newRow.id = thingUri + plugin;
-		    
-		    // add fields to the row
-		    newCell = newRow.insertCell(-1);		    
-		    newCell.innerHTML = '<i class="fas fa-music"></i>&nbsp;' + plugin;
-		    // newCell.setAttribute("title", actionUri);
-		    
-		    newCell = newRow.insertCell(-1);
-		    newCell.innerHTML = '<i class="fas fa-cogs"></i>&nbsp;' + thingName;
-		    newCell.setAttribute("title", thingUri);
+			// add a row to the table
+			newRow = plgTable.insertRow(-1);
+			
+			// build the ID of the row with the concatenation of
+			// thingURI + actionURI
+			newRow.id = thingUri + plugin;
+			
+			// add fields to the row
+			newCell = newRow.insertCell(-1);		    
+			newCell.innerHTML = '<i class="fas fa-music"></i>&nbsp;' + plugin;
+			// newCell.setAttribute("title", actionUri);
+			
+			newCell = newRow.insertCell(-1);
+			newCell.innerHTML = '<i class="fas fa-cogs"></i>&nbsp;' + thingName;
+			newCell.setAttribute("title", thingUri);
+		    }
 		    
 		}
 		
@@ -522,7 +544,7 @@ function messageHandler(event){
 			"  OPTIONAL { ?instance wot:hasConfirmationTimeStamp ?confirmation } . " + 
 			"  OPTIONAL { ?instance wot:hasCompletionTimeStamp ?completion } . " +
 			"  GRAPH <" + graphUri + "> { ?s ?p ?o } " +
-		    "}";		
+			"}";		
 		    var req = $.ajax({
 			url: updURI,
 			crossOrigin: true,
@@ -568,77 +590,21 @@ function invokeAction(){
     // debug print
     console.log("=== INFO === invokeAction called();");
 
-    // get the content of the file
-    transform = document.getElementById("transform").value;
-
-    // parse
-    var parser = N3.Parser({ format: 'N3' });
-    parsed = parser.parse(transform);
-    
-    // initialize an empty SPARQL UPDATE
-    updText = "PREFIX xsd:<http://www.w3.org/2001/XMLSchema#> INSERT DATA { ";
-
-    // get the URI of the transform
+    // get the requested action
     transformUri = null;
-    
-    // iterate over triples
-    for (triple in parsed) {
+    actionUri = null;
+    thingUri = null;
+    songPath = null;
 
-	// add subject
-	if (N3.Util.isIRI(parsed[triple]["subject"])){
-	    updText+= " <" + parsed[triple]["subject"] + "> "
-	} else {
-	    updText+= parsed[triple]["subject"] + " " ;
-	}
-	
-	// add predicate
-	if (N3.Util.isIRI(parsed[triple]["predicate"])){
-	    updText+= " <" + parsed[triple]["predicate"] + "> "	
-	};
-	
-	// add object
-	if (N3.Util.isIRI(parsed[triple]["object"])){
-	    updText+= " <" + parsed[triple]["object"] + "> . "	
-	} else if (N3.Util.isLiteral(parsed[triple]["object"])) {
-	    updText+= ' "' + N3.Util.getLiteralValue(parsed[triple]["object"]) + '" . ';
-	} else {
-	    updText+= parsed[triple]["object"] + ' . '
-	}
+    // input lines
+    inputLines = "";
 
-	// check if rdf:type transform
-	if ((parsed[triple]["predicate"] === "http://www.w3.org/1999/02/22-rdf-syntax-ns#type") &&
-	    (parsed[triple]["object"] === "http://purl.org/ontology/vamp/Transform")){
-	    transformUri = parsed[triple]["subject"];
-	}
-	
-    }
-
-    // finalize the SPARQL UPDATE
-    updText += " }"
+    // initialize the uri
+    inputDataUri = "http://ns#" + uuid.v4();
     
     // get the update uri
     updURI = document.getElementById("updateURI").value;
-
-    // send the update
-    var req = $.ajax({
-	url: updURI,
-	crossOrigin: true,
-	method: 'POST',
-	contentType: "application/sparql-update",
-	data: updText,	
-	error: function(event){
-	    console.log("[DEBUG] Connection failed!");
-	    console.log("Update request failed");
-	    return false;
-	},
-	success: function(data){
-	    console.log("Update request successful");
-	}
-    });
     
-    // get the requested action
-    actionUri = null;
-    thingUri = null;
     actRadios = document.getElementsByName("selectedAction");
     for (el in actRadios){
 	if (actRadios[el].checked){
@@ -647,81 +613,199 @@ function invokeAction(){
 	}
     }
 
-    // get the requested song
-    songPath = null;
-    songRadios = document.getElementsByName("selectedSong");
-    for (el in songRadios){
-	if (songRadios[el].checked){
-	    songPath = songRadios[el]["value"];
-	}
-    }
-    
-    // build the sparql update with the action request
-    instanceUri = "http://ns#" + uuid.v4();
-
-    // subscribe to the result
-
-    // open a new websocket
-    var ws2 = new WebSocket(subscribeURI);
-    
-    // handler onopen
-    ws2.onopen = function(){
-	subText =  "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> " +
-	    "PREFIX wot: <http://wot.arces.unibo.it/sepa#> " +
-	    "PREFIX td: <http://wot.arces.unibo.it/ontology/web_of_things#> " +
-	    "SELECT ?timestamp ?value " +
-	    " WHERE { " +
-	    " ?thing td:hasAction ?action . " +
-	    " ?action rdf:type td:Action . " +
-	    " ?action wot:hasActionInstance <" + instanceUri + "> . " +
-	    " <" + instanceUri + "> wot:hasCompletionTimeStamp ?timestamp . " + 
-	    " OPTIONAL{ " + 
-	    "   <" + instanceUri + "> wot:hasOutputData ?output . " +
-	    "   ?output wot:hasOutputField ?outputField ." +
-	    "   ?outputField wot:hasValue ?value }}"
-	ws2.send(JSON.stringify({"subscribe":subText, "alias":"actionOutput"}));	    
-    };
-    ws2.onmessage = messageHandler;
-
-    // insert the update request into sepa
-    inputDataUri = "http://ns#" + uuid.v4();
-    inputFieldUri1 = "http://ns#" + uuid.v4();
-    inputFieldUri2 = "http://ns#" + uuid.v4();
-    updText = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> " +
+    // determine the type of input for the action
+    qText = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> " +
 	"PREFIX wot: <http://wot.arces.unibo.it/sepa#> " +
-	"PREFIX td: <http://wot.arces.unibo.it/ontology/web_of_things#> " + 
-	"INSERT { " +
-	" <" + actionUri + "> wot:hasActionInstance <" + instanceUri + "> . " +
-	" <" + instanceUri + "> wot:hasRequestTimeStamp ?request . " +
-	" <" + instanceUri + "> wot:hasInputData <" + inputDataUri + "> . " +
-	" <" + inputDataUri + "> wot:hasInputField <" + inputFieldUri1 + "> . " +
-	" <" + inputFieldUri1 + "> wot:hasValue <" + transformUri + "> . " +
-	" <" + inputFieldUri1 + "> wot:hasName 'transformUri' . " +
-	" <" + inputDataUri + "> wot:hasInputField <" + inputFieldUri2 + "> . " +
-	" <" + inputFieldUri2 + "> wot:hasValue '" + songPath + "' . " +
-	" <" + inputFieldUri2 + "> wot:hasName 'audio' . " +
-	" <" + instanceUri + "> rdf:type wot:ActionInstance } " +
+	"PREFIX td: <http://wot.arces.unibo.it/ontology/web_of_things#> " +
+	"SELECT ?inField ?fieldName ?fieldType " +
 	" WHERE { " +
-	" <" + actionUri + "> rdf:type td:Action . " +	
-	" BIND(now() AS ?request)}";
-    
-    // send the update
+	" <" + actionUri + "> wot:hasInputDataSchema ?inputDS . " + 
+	" ?inputDS wot:hasField ?inField . " +
+	" ?inField rdf:type wot:FieldSchema . " +
+	" ?inField wot:hasName ?fieldName . " +
+	" ?inField wot:hasType ?fieldType " +
+	" }"
+    queryURI = document.getElementById("queryURI").value;
     var req = $.ajax({
-	url: updURI,
+	url: queryURI,
 	crossOrigin: true,
 	method: 'POST',
-	contentType: "application/sparql-update",
-	data: updText,	
+	contentType: "application/sparql-query",
+	data: qText,	
 	error: function(event){
 	    console.log("[DEBUG] Connection failed!");
-	    console.log("Update request failed");
+	    console.log("Query request failed");
 	    return false;
 	},
 	success: function(data){
-	    console.log("Update request successful");
+	    console.log(data);
+	    for (b in data["results"]["bindings"]){
+
+		console.log(data["results"]["bindings"][b])
+		
+		// check the data type
+		if (data["results"]["bindings"][b]["fieldType"]["value"] === "xsd:string"){
+
+		    // get the textbox value
+		    pattern = document.getElementById("transform").value;
+		    
+		    // add the input field
+		    inputFieldUri2 = "http://ns#" + uuid.v4();
+		    inputLines += " <" + inputDataUri + "> wot:hasInputField <" + inputFieldUri2 + "> . " +
+    			" <" + inputFieldUri2 + "> wot:hasValue '" + pattern + "' . " +
+    			" <" + inputFieldUri2 + "> wot:hasName 'searchPattern' . "
+		    
+		} else  if (data["results"]["bindings"][b]["fieldType"]["value"] === "http://www.w3.org/1999/02/22-rdf-syntax-ns#Resource"){
+		    // get the requested song
+		    songRadios = document.getElementsByName("selectedSong");
+		    for (el in songRadios){
+    			if (songRadios[el].checked){
+    			    songPath = songRadios[el]["value"];
+			    
+			    // add the input field
+			    inputFieldUri2 = "http://ns#" + uuid.v4();
+			    inputLines += " <" + inputDataUri + "> wot:hasInputField <" + inputFieldUri2 + "> . " +
+    				" <" + inputFieldUri2 + "> wot:hasValue '" + songPath + "' . " +
+    				" <" + inputFieldUri2 + "> wot:hasName 'audio' . "
+    			}
+		    }
+		}	    	    
+		else if (data["results"]["bindings"][b]["fieldType"]["value"] === "http://audiocommons.org/ns/audiocommons#Transform"){
+		    
+		    // get the content of the file
+		    transform = document.getElementById("transform").value;
+
+		    // parse
+		    var parser = N3.Parser({ format: 'N3' });
+		    parsed = parser.parse(transform);
+		    
+		    // initialize an empty SPARQL UPDATE
+		    updText = "PREFIX xsd:<http://www.w3.org/2001/XMLSchema#> INSERT DATA { ";
+		    
+		    // iterate over triples
+		    for (triple in parsed) {
+
+    			// add subject
+    			if (N3.Util.isIRI(parsed[triple]["subject"])){
+    			    updText+= " <" + parsed[triple]["subject"] + "> "
+    			} else {
+    			    updText+= parsed[triple]["subject"] + " " ;
+    			}
+			
+    			// add predicate
+    			if (N3.Util.isIRI(parsed[triple]["predicate"])){
+    			    updText+= " <" + parsed[triple]["predicate"] + "> "	
+    			};
+			
+    			// add object
+    			if (N3.Util.isIRI(parsed[triple]["object"])){
+    			    updText+= " <" + parsed[triple]["object"] + "> . "	
+    			} else if (N3.Util.isLiteral(parsed[triple]["object"])) {
+    			    updText+= ' "' + N3.Util.getLiteralValue(parsed[triple]["object"]) + '" . ';
+    			} else {
+    			    updText+= parsed[triple]["object"] + ' . '
+    			}
+
+    			// check if rdf:type transform
+    			if ((parsed[triple]["predicate"] === "http://www.w3.org/1999/02/22-rdf-syntax-ns#type") &&
+    			    (parsed[triple]["object"] === "http://purl.org/ontology/vamp/Transform")){
+    			    transformUri = parsed[triple]["subject"];
+    			}
+			
+		    }
+
+		    // finalize the SPARQL UPDATE
+		    updText += " }"
+		    
+		    // send the update
+		    var req = $.ajax({
+    		        url: updURI,
+    		        crossOrigin: true,
+    		        method: 'POST',
+    		        contentType: "application/sparql-update",
+    		        data: updText,	
+    		        error: function(event){
+    		    	console.log("[DEBUG] Connection failed!");
+    		    	console.log("Update request failed");
+    		    	return false;
+    		        },
+    		        success: function(data){
+    		    	console.log("Update request successful");
+    		        }
+		    });
+
+		    // add the field
+		    inputFieldUri1 = "http://ns#" + uuid.v4();
+		    inputLines += " <" + inputDataUri + "> wot:hasInputField <" + inputFieldUri1 + "> . " +
+    			" <" + inputFieldUri1 + "> wot:hasValue <" + transformUri + "> . " +
+    			" <" + inputFieldUri1 + "> wot:hasName 'transformUri' . "
+		    
+		}	
+	    }
+	    console.log(inputLines);
+
+	    // build the sparql update with the action request
+	    instanceUri = "http://ns#" + uuid.v4();
+
+	    // subscribe to the result
+
+	    // open a new websocket
+	    var ws2 = new WebSocket(subscribeURI);
+	    
+	    // handler onopen
+	    ws2.onopen = function(){
+    		subText =  "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> " +
+    		    "PREFIX wot: <http://wot.arces.unibo.it/sepa#> " +
+    		    "PREFIX td: <http://wot.arces.unibo.it/ontology/web_of_things#> " +
+    		    "SELECT ?timestamp ?value " +
+    		    " WHERE { " +
+    		    " ?thing td:hasAction ?action . " +
+    		    " ?action rdf:type td:Action . " +
+    		    " ?action wot:hasActionInstance <" + instanceUri + "> . " +
+    		    " <" + instanceUri + "> wot:hasCompletionTimeStamp ?timestamp . " + 
+    		    " OPTIONAL{ " + 
+    		    "   <" + instanceUri + "> wot:hasOutputData ?output . " +
+    		    "   ?output wot:hasOutputField ?outputField ." +
+    		    "   ?outputField wot:hasValue ?value }}"
+    		ws2.send(JSON.stringify({"subscribe":subText, "alias":"actionOutput"}));	    
+	    };
+	    ws2.onmessage = messageHandler;
+
+	    // insert the update request into sepa
+	    inputFieldUri1 = "http://ns#" + uuid.v4();
+	    updText = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> " +
+    		"PREFIX wot: <http://wot.arces.unibo.it/sepa#> " +
+    		"PREFIX td: <http://wot.arces.unibo.it/ontology/web_of_things#> " + 
+    		"INSERT { " +
+		inputLines +
+		" <" + actionUri + "> wot:hasActionInstance <" + instanceUri + "> . " + 
+    		" <" + instanceUri + "> rdf:type wot:ActionInstance . " +
+		" <" + instanceUri + "> wot:hasInputData <" + inputDataUri + "> . " +
+		" <" + instanceUri + "> wot:hasRequestTimeStamp ?request } " +
+    		" WHERE { " +
+    		" <" + actionUri + "> rdf:type td:Action . " +	
+    		" BIND(now() AS ?request)}";
+	    
+	    // send the update
+	    console.log(updText);
+	    var req = $.ajax({
+    		url: updURI,
+    		crossOrigin: true,
+    		method: 'POST',
+    		contentType: "application/sparql-update",
+    		data: updText,	
+    		error: function(event){
+    		    console.log("[DEBUG] Connection failed!");
+    		    console.log("Update request failed");
+    		    return false;
+    		},
+    		success: function(data){
+    		    console.log("Update request successful");
+    		}
+	    });
+	    
 	}
-    });
-    
+    })           
 }
 
 
@@ -757,4 +841,31 @@ function loadTransform(){
 	}
 	fr.readAsText(file);	
     }
+}
+
+
+
+/////////////////////////////////////////////////////////////////////////
+//
+// load Transform
+//
+/////////////////////////////////////////////////////////////////////////
+function clearSepa(){
+
+    updURI = document.getElementById("updateURI").value;
+    var req = $.ajax({
+    	url: updURI,
+    	crossOrigin: true,
+    	method: 'POST',
+    	contentType: "application/sparql-update",
+    	data: "DELETE { ?s ?p ?o } WHERE { ?s ?p ?o }",	
+    	error: function(event){
+    	    console.log("[DEBUG] Connection failed!");
+    	    console.log("Update request failed");
+    	    return false;
+    	},
+    	success: function(data){
+    	    console.log("Update request successful");
+    	}
+    });
 }
